@@ -23,6 +23,7 @@ binary: objs/nginx
 objs/nginx: objs/src/core/nginx.o
 	$(LINK)  -o objs/nginx objs/src/core/nginx.o
 
-objs/src/core/nginx.o:  $(CORE_DEPS)
+objs/src/core/nginx.o: $(CORE_DEPS) \
+	 src/core/nginx.c
 	$(CC) -c $(CFLAGS) $(CORE_INCS) -o objs/src/core/nginx.o src/core/nginx.c 
  
