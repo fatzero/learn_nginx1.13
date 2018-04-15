@@ -23,6 +23,7 @@ NGX_ABORT	src/core/ngx_core.h	41;"	d
 NGX_AGAIN	src/core/ngx_core.h	37;"	d
 NGX_ALIGNMENT	src/core/ngx_config.h	97;"	d
 NGX_BUSY	src/core/ngx_core.h	38;"	d
+NGX_CHAIN_ERROR	src/core/ngx_buf.h	125;"	d
 NGX_CHANGEBIN_SIGNAL	src/core/ngx_config.h	67;"	d
 NGX_CHANGEBIN_SIGNAL	src/core/ngx_config.h	70;"	d
 NGX_COMPAT_BEGIN	src/core/ngx_config.h	134;"	d
@@ -36,6 +37,7 @@ NGX_CONF_PREFIX	objs/ngx_auto_config.h	377;"	d
 NGX_CPU_CACHE_LINE	objs/ngx_auto_config.h	79;"	d
 NGX_CRYPT	objs/ngx_auto_config.h	342;"	d
 NGX_DECLINED	src/core/ngx_core.h	40;"	d
+NGX_DEFAULT_POOL_SIZE	src/core/ngx_palloc.h	22;"	d
 NGX_DISABLE_SYMLINKS_NOTOWNER	src/core/ngx_core.h	108;"	d
 NGX_DISABLE_SYMLINKS_OFF	src/core/ngx_core.h	106;"	d
 NGX_DISABLE_SYMLINKS_ON	src/core/ngx_core.h	107;"	d
@@ -108,6 +110,9 @@ NGX_HAVE_TCP_INFO	objs/ngx_auto_config.h	157;"	d
 NGX_HAVE_TRANSPARENT_PROXY	objs/ngx_auto_config.h	127;"	d
 NGX_HAVE_UNISTD_H	objs/ngx_auto_headers.h	4;"	d
 NGX_HAVE_UNIX_DOMAIN	objs/ngx_auto_config.h	177;"	d
+NGX_HAVE_VARIADIC_MACROS	src/core/ngx_log.h	115;"	d
+NGX_HAVE_VARIADIC_MACROS	src/core/ngx_log.h	83;"	d
+NGX_HAVE_VARIADIC_MACROS	src/core/ngx_log.h	99;"	d
 NGX_HTTP_CACHE	objs/ngx_auto_config.h	327;"	d
 NGX_HTTP_CLIENT_TEMP_PATH	objs/ngx_auto_config.h	412;"	d
 NGX_HTTP_FASTCGI_TEMP_PATH	objs/ngx_auto_config.h	422;"	d
@@ -129,8 +134,30 @@ NGX_KQUEUE_UDATA_T	objs/ngx_auto_config.h	83;"	d
 NGX_LINUX	objs/ngx_auto_headers.h	39;"	d
 NGX_LISTEN_BACKLOG	src/os/unix/ngx_linux_config.h	102;"	d
 NGX_LOCK_PATH	objs/ngx_auto_config.h	397;"	d
+NGX_LOG_ALERT	src/core/ngx_log.h	18;"	d
+NGX_LOG_CRIT	src/core/ngx_log.h	19;"	d
+NGX_LOG_DEBUG	src/core/ngx_log.h	24;"	d
+NGX_LOG_DEBUG_ALL	src/core/ngx_log.h	42;"	d
+NGX_LOG_DEBUG_ALLOC	src/core/ngx_log.h	27;"	d
+NGX_LOG_DEBUG_CONNECTION	src/core/ngx_log.h	41;"	d
+NGX_LOG_DEBUG_CORE	src/core/ngx_log.h	26;"	d
+NGX_LOG_DEBUG_EVENT	src/core/ngx_log.h	29;"	d
+NGX_LOG_DEBUG_FIRST	src/core/ngx_log.h	39;"	d
+NGX_LOG_DEBUG_HTTP	src/core/ngx_log.h	30;"	d
+NGX_LOG_DEBUG_LAST	src/core/ngx_log.h	40;"	d
+NGX_LOG_DEBUG_MAIL	src/core/ngx_log.h	31;"	d
+NGX_LOG_DEBUG_MUTEX	src/core/ngx_log.h	28;"	d
+NGX_LOG_DEBUG_STREAM	src/core/ngx_log.h	32;"	d
+NGX_LOG_EMERG	src/core/ngx_log.h	17;"	d
+NGX_LOG_ERR	src/core/ngx_log.h	20;"	d
+NGX_LOG_INFO	src/core/ngx_log.h	23;"	d
+NGX_LOG_NOTICE	src/core/ngx_log.h	22;"	d
+NGX_LOG_STDERR	src/core/ngx_log.h	16;"	d
+NGX_LOG_WARN	src/core/ngx_log.h	21;"	d
 NGX_MAXHOSTNAMELEN	src/core/ngx_config.h	122;"	d
 NGX_MAXHOSTNAMELEN	src/core/ngx_config.h	124;"	d
+NGX_MAX_ALLOC_FROM_POOL	src/core/ngx_palloc.h	20;"	d
+NGX_MAX_ERROR_STR	src/core/ngx_log.h	76;"	d
 NGX_MAX_INT32_VALUE	src/core/ngx_config.h	129;"	d
 NGX_MAX_INT_T_VALUE	src/core/ngx_config.h	88;"	d
 NGX_MAX_INT_T_VALUE	src/core/ngx_config.h	92;"	d
@@ -138,12 +165,14 @@ NGX_MAX_OFF_T_VALUE	objs/ngx_auto_config.h	207;"	d
 NGX_MAX_SIZE_T_VALUE	objs/ngx_auto_config.h	197;"	d
 NGX_MAX_TIME_T_VALUE	objs/ngx_auto_config.h	227;"	d
 NGX_MAX_UINT32_VALUE	src/core/ngx_config.h	128;"	d
+NGX_MIN_POOL_SIZE	src/core/ngx_palloc.h	25;"	d
 NGX_NOACCEPT_SIGNAL	src/core/ngx_config.h	62;"	d
 NGX_OFF_T_LEN	objs/ngx_auto_config.h	212;"	d
 NGX_OK	src/core/ngx_core.h	35;"	d
 NGX_OLDPID_EXT	src/core/nginx.h	23;"	d
 NGX_PCRE	objs/ngx_auto_config.h	362;"	d
 NGX_PID_PATH	objs/ngx_auto_config.h	392;"	d
+NGX_POOL_ALIGNMENT	src/core/ngx_palloc.h	24;"	d
 NGX_PREFIX	objs/ngx_auto_config.h	372;"	d
 NGX_PTR_SIZE	objs/ngx_auto_config.h	182;"	d
 NGX_RECONFIGURE_SIGNAL	src/core/ngx_config.h	63;"	d
@@ -165,44 +194,270 @@ NGX_ZLIB	objs/ngx_auto_config.h	367;"	d
 _FILE_OFFSET_BITS	src/os/unix/ngx_linux_config.h	16;"	d
 _GNU_SOURCE	src/os/unix/ngx_linux_config.h	13;"	d
 _NGINX_H_INCLUDED_	src/core/nginx.h	9;"	d
+_NGX_ALLOC_H_INCLUDED_	src/os/unix/ngx_alloc.h	9;"	d
+_NGX_ARRAY_H_INCLUDED_	src/core/ngx_array.h	9;"	d
+_NGX_BUF_H_INCLUDED_	src/core/ngx_buf.h	9;"	d
 _NGX_CONFIG_H_INCLUDED_	src/core/ngx_config.h	9;"	d
 _NGX_CORE_H_INCLUDED_	src/core/ngx_core.h	9;"	d
 _NGX_LINUX_CONFIG_H_INCLUDED_	src/os/unix/ngx_linux_config.h	9;"	d
+_NGX_LIST_H_INCLUDED_	src/core/ngx_list.h	9;"	d
+_NGX_LOG_H_INCLUDED_	src/core/ngx_log.h	9;"	d
+_NGX_PALLOC_H_INCLUDED_	src/core/ngx_palloc.h	9;"	d
 __FreeBSD__	src/core/ngx_config.h	16;"	d
 __FreeBSD_version	src/core/ngx_config.h	17;"	d
+action	src/core/ngx_log.h	/^    char                *action;$/;"	m	struct:ngx_log_s
+aio	src/core/ngx_buf.h	/^    unsigned                     aio:1;$/;"	m	struct:ngx_output_chain_ctx_s
+aio_handler	src/core/ngx_buf.h	/^    ngx_output_chain_aio_pt      aio_handler;$/;"	m	struct:ngx_output_chain_ctx_s
+aio_preload	src/core/ngx_buf.h	/^    ssize_t                    (*aio_preload)(ngx_buf_t *file);$/;"	m	struct:ngx_output_chain_ctx_s
+alignment	src/core/ngx_buf.h	/^    off_t                        alignment;$/;"	m	struct:ngx_output_chain_ctx_s
+alloc	src/core/ngx_palloc.h	/^    void                 *alloc;$/;"	m	struct:ngx_pool_large_s
+allocated	src/core/ngx_buf.h	/^    ngx_int_t                    allocated;$/;"	m	struct:ngx_output_chain_ctx_s
+buf	src/core/ngx_buf.h	/^    ngx_buf_t                   *buf;$/;"	m	struct:ngx_output_chain_ctx_s
+buf	src/core/ngx_buf.h	/^    ngx_buf_t    *buf;$/;"	m	struct:ngx_chain_s
+bufs	src/core/ngx_buf.h	/^    ngx_bufs_t                   bufs;$/;"	m	struct:ngx_output_chain_ctx_s
+busy	src/core/ngx_buf.h	/^    ngx_chain_t                 *busy;$/;"	m	struct:ngx_output_chain_ctx_s
+chain	src/core/ngx_palloc.h	/^    ngx_chain_t          *chain;$/;"	m	struct:ngx_pool_s
+cleanup	src/core/ngx_palloc.h	/^    ngx_pool_cleanup_t   *cleanup;$/;"	m	struct:ngx_pool_s
+connection	src/core/ngx_buf.h	/^    ngx_connection_t            *connection;$/;"	m	struct:__anon4
+connection	src/core/ngx_log.h	/^    ngx_atomic_uint_t    connection;$/;"	m	struct:ngx_log_s
+current	src/core/ngx_palloc.h	/^    ngx_pool_t           *current;$/;"	m	struct:ngx_pool_s
+d	src/core/ngx_palloc.h	/^    ngx_pool_data_t       d;$/;"	m	struct:ngx_pool_s
+data	src/core/ngx_log.h	/^    void                *data;$/;"	m	struct:ngx_log_s
+data	src/core/ngx_palloc.h	/^    void                 *data;$/;"	m	struct:ngx_pool_cleanup_s
+debug_levels	src/core/ngx_log.c	/^static const char *debug_levels[] = {$/;"	v	file:
+directio	src/core/ngx_buf.h	/^    unsigned                     directio:1;$/;"	m	struct:ngx_output_chain_ctx_s
+disk_full_time	src/core/ngx_log.h	/^    time_t               disk_full_time;$/;"	m	struct:ngx_log_s
+elts	src/core/ngx_array.h	/^    void        *elts;$/;"	m	struct:__anon6
+elts	src/core/ngx_list.h	/^    void             *elts;$/;"	m	struct:ngx_list_part_s
+end	src/core/ngx_buf.h	/^    u_char          *end;           \/* end of buffer *\/$/;"	m	struct:ngx_buf_s
+end	src/core/ngx_log.c	/^    u_char        *end;$/;"	m	struct:__anon5	file:
+end	src/core/ngx_palloc.h	/^    u_char               *end;$/;"	m	struct:__anon1
+err_levels	src/core/ngx_log.c	/^static ngx_str_t err_levels[] = {$/;"	v	file:
+failed	src/core/ngx_palloc.h	/^    ngx_uint_t            failed;$/;"	m	struct:__anon1
+fd	src/core/ngx_palloc.h	/^    ngx_fd_t              fd;$/;"	m	struct:__anon2
+file	src/core/ngx_buf.h	/^    ngx_file_t      *file;$/;"	m	struct:ngx_buf_s
+file	src/core/ngx_log.h	/^    ngx_open_file_t     *file;$/;"	m	struct:ngx_log_s
+file_last	src/core/ngx_buf.h	/^    off_t            file_last;$/;"	m	struct:ngx_buf_s
+file_pos	src/core/ngx_buf.h	/^    off_t            file_pos;$/;"	m	struct:ngx_buf_s
+filter_ctx	src/core/ngx_buf.h	/^    void                        *filter_ctx;$/;"	m	struct:ngx_output_chain_ctx_s
+flush	src/core/ngx_buf.h	/^    unsigned         flush:1;$/;"	m	struct:ngx_buf_s
+free	src/core/ngx_buf.h	/^    ngx_chain_t                 *free;$/;"	m	struct:ngx_output_chain_ctx_s
+handler	src/core/ngx_log.h	/^    ngx_log_handler_pt   handler;$/;"	m	struct:ngx_log_s
+handler	src/core/ngx_palloc.h	/^    ngx_pool_cleanup_pt   handler;$/;"	m	struct:ngx_pool_cleanup_s
+in	src/core/ngx_buf.h	/^    ngx_chain_t                 *in;$/;"	m	struct:ngx_output_chain_ctx_s
+in_file	src/core/ngx_buf.h	/^    unsigned         in_file:1;$/;"	m	struct:ngx_buf_s
+large	src/core/ngx_palloc.h	/^    ngx_pool_large_t     *large;$/;"	m	struct:ngx_pool_s
+last	src/core/ngx_buf.h	/^    ngx_chain_t                **last;$/;"	m	struct:__anon4
+last	src/core/ngx_buf.h	/^    u_char          *last;$/;"	m	struct:ngx_buf_s
+last	src/core/ngx_list.h	/^    ngx_list_part_t  *last;$/;"	m	struct:__anon7
+last	src/core/ngx_palloc.h	/^    u_char               *last;$/;"	m	struct:__anon1
+last_buf	src/core/ngx_buf.h	/^    unsigned         last_buf:1;$/;"	m	struct:ngx_buf_s
+last_in_chain	src/core/ngx_buf.h	/^    unsigned         last_in_chain:1;$/;"	m	struct:ngx_buf_s
+last_shadow	src/core/ngx_buf.h	/^    unsigned         last_shadow:1;$/;"	m	struct:ngx_buf_s
+limit	src/core/ngx_buf.h	/^    off_t                        limit;$/;"	m	struct:__anon4
+log	src/core/ngx_palloc.h	/^    ngx_log_t            *log;$/;"	m	struct:__anon2
+log	src/core/ngx_palloc.h	/^    ngx_log_t            *log;$/;"	m	struct:ngx_pool_s
+log_level	src/core/ngx_log.h	/^    ngx_uint_t           log_level;$/;"	m	struct:ngx_log_s
 main	src/core/nginx.c	/^int main()$/;"	f
+max	src/core/ngx_palloc.h	/^    size_t                max;$/;"	m	struct:ngx_pool_s
+memory	src/core/ngx_buf.h	/^    unsigned         memory:1;$/;"	m	struct:ngx_buf_s
+mmap	src/core/ngx_buf.h	/^    unsigned         mmap:1;$/;"	m	struct:ngx_buf_s
+nalloc	src/core/ngx_array.h	/^    ngx_uint_t   nalloc;$/;"	m	struct:__anon6
+nalloc	src/core/ngx_list.h	/^    ngx_uint_t        nalloc;$/;"	m	struct:__anon7
+name	src/core/ngx_palloc.h	/^    u_char               *name;$/;"	m	struct:__anon2
+need_in_memory	src/core/ngx_buf.h	/^    unsigned                     need_in_memory:1;$/;"	m	struct:ngx_output_chain_ctx_s
+need_in_temp	src/core/ngx_buf.h	/^    unsigned                     need_in_temp:1;$/;"	m	struct:ngx_output_chain_ctx_s
+nelts	src/core/ngx_array.h	/^    ngx_uint_t   nelts;$/;"	m	struct:__anon6
+nelts	src/core/ngx_list.h	/^    ngx_uint_t        nelts;$/;"	m	struct:ngx_list_part_s
+next	src/core/ngx_buf.h	/^    ngx_chain_t  *next;$/;"	m	struct:ngx_chain_s
+next	src/core/ngx_list.h	/^    ngx_list_part_t  *next;$/;"	m	struct:ngx_list_part_s
+next	src/core/ngx_log.h	/^    ngx_log_t           *next;$/;"	m	struct:ngx_log_s
+next	src/core/ngx_palloc.h	/^    ngx_pool_cleanup_t   *next;$/;"	m	struct:ngx_pool_cleanup_s
+next	src/core/ngx_palloc.h	/^    ngx_pool_large_t     *next;$/;"	m	struct:ngx_pool_large_s
+next	src/core/ngx_palloc.h	/^    ngx_pool_t           *next;$/;"	m	struct:__anon1
 nginx_version	src/core/nginx.h	12;"	d
 ngx_abort	src/core/ngx_config.h	105;"	d
 ngx_abs	src/core/ngx_core.h	99;"	d
 ngx_aiocb_t	src/os/unix/ngx_linux_config.h	/^typedef struct iocb  ngx_aiocb_t;$/;"	t	typeref:struct:iocb
 ngx_align	src/core/ngx_config.h	100;"	d
 ngx_align_ptr	src/core/ngx_config.h	101;"	d
+ngx_alloc	src/os/unix/ngx_alloc.c	/^ngx_alloc(size_t size, ngx_log_t *log)$/;"	f
+ngx_alloc_buf	src/core/ngx_buf.h	147;"	d
+ngx_array_create	src/core/ngx_array.c	/^ngx_array_create(ngx_pool_t *p, ngx_uint_t n, size_t size)$/;"	f
+ngx_array_destroy	src/core/ngx_array.c	/^ngx_array_destroy(ngx_array_t *a)$/;"	f
+ngx_array_init	src/core/ngx_array.h	/^ngx_array_init(ngx_array_t *array, ngx_pool_t *pool, ngx_uint_t n, size_t size)$/;"	f
+ngx_array_push	src/core/ngx_array.c	/^ngx_array_push(ngx_array_t *a)$/;"	f
+ngx_array_push_n	src/core/ngx_array.c	/^ngx_array_push_n(ngx_array_t *a, ngx_uint_t n)$/;"	f
+ngx_array_t	src/core/ngx_array.h	/^} ngx_array_t;$/;"	t	typeref:struct:__anon6
+ngx_buf_in_memory	src/core/ngx_buf.h	128;"	d
+ngx_buf_in_memory_only	src/core/ngx_buf.h	129;"	d
+ngx_buf_s	src/core/ngx_buf.h	/^struct ngx_buf_s {$/;"	s
+ngx_buf_size	src/core/ngx_buf.h	139;"	d
+ngx_buf_special	src/core/ngx_buf.h	131;"	d
+ngx_buf_sync_only	src/core/ngx_buf.h	135;"	d
+ngx_buf_t	src/core/ngx_buf.h	/^typedef struct ngx_buf_s  ngx_buf_t;$/;"	t	typeref:struct:ngx_buf_s
+ngx_buf_tag_t	src/core/ngx_buf.h	/^typedef void *            ngx_buf_tag_t;$/;"	t
+ngx_bufs_t	src/core/ngx_buf.h	/^} ngx_bufs_t;$/;"	t	typeref:struct:__anon3
+ngx_cacheline_size	src/os/unix/ngx_alloc.c	/^ngx_uint_t  ngx_cacheline_size;$/;"	v
+ngx_calloc	src/os/unix/ngx_alloc.c	/^ngx_calloc(size_t size, ngx_log_t *log)$/;"	f
+ngx_calloc_buf	src/core/ngx_buf.h	148;"	d
 ngx_cdecl	src/core/ngx_config.h	73;"	d
+ngx_chain_s	src/core/ngx_buf.h	/^struct ngx_chain_s {$/;"	s
 ngx_chain_t	src/core/ngx_core.h	/^typedef struct ngx_chain_s           ngx_chain_t;$/;"	t	typeref:struct:ngx_chain_s
+ngx_chain_writer_ctx_t	src/core/ngx_buf.h	/^} ngx_chain_writer_ctx_t;$/;"	t	typeref:struct:__anon4
 ngx_command_t	src/core/ngx_core.h	/^typedef struct ngx_command_s         ngx_command_t;$/;"	t	typeref:struct:ngx_command_s
 ngx_conf_t	src/core/ngx_core.h	/^typedef struct ngx_conf_s            ngx_conf_t;$/;"	t	typeref:struct:ngx_conf_s
 ngx_connection_handler_pt	src/core/ngx_core.h	/^typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);$/;"	t
 ngx_connection_t	src/core/ngx_core.h	/^typedef struct ngx_connection_s      ngx_connection_t;$/;"	t	typeref:struct:ngx_connection_s
+ngx_create_pool	src/core/ngx_palloc.c	/^ngx_create_pool(size_t size, ngx_log_t *log)$/;"	f
+ngx_create_temp_buf	src/core/ngx_buf.c	/^ngx_create_temp_buf(ngx_pool_t *pool, size_t size)$/;"	f
 ngx_cycle_t	src/core/ngx_core.h	/^typedef struct ngx_cycle_s           ngx_cycle_t;$/;"	t	typeref:struct:ngx_cycle_s
 ngx_debug_init	src/os/unix/ngx_linux_config.h	117;"	d
+ngx_destroy_pool	src/core/ngx_palloc.c	/^ngx_destroy_pool(ngx_pool_t *pool)$/;"	f
+ngx_errlog_commands	src/core/ngx_log.c	/^static ngx_command_t  ngx_errlog_commands[] = {$/;"	v	file:
+ngx_errlog_module	src/core/ngx_log.c	/^ngx_module_t  ngx_errlog_module = {$/;"	v
+ngx_errlog_module_ctx	src/core/ngx_log.c	/^static ngx_core_module_t  ngx_errlog_module_ctx = {$/;"	v	file:
+ngx_error_log	src/core/ngx_log.c	/^ngx_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f	file:
 ngx_event_aio_t	src/core/ngx_core.h	/^typedef struct ngx_event_aio_s       ngx_event_aio_t;$/;"	t	typeref:struct:ngx_event_aio_s
 ngx_event_handler_pt	src/core/ngx_core.h	/^typedef void (*ngx_event_handler_pt)(ngx_event_t *ev);$/;"	t
 ngx_event_t	src/core/ngx_core.h	/^typedef struct ngx_event_s           ngx_event_t;$/;"	t	typeref:struct:ngx_event_s
 ngx_file_t	src/core/ngx_core.h	/^typedef struct ngx_file_s            ngx_file_t;$/;"	t	typeref:struct:ngx_file_s
 ngx_flag_t	src/core/ngx_config.h	/^typedef intptr_t        ngx_flag_t;$/;"	t
+ngx_free	src/os/unix/ngx_alloc.h	19;"	d
+ngx_free_chain	src/core/ngx_buf.h	151;"	d
 ngx_inline	src/core/ngx_config.h	114;"	d
 ngx_int_t	src/core/ngx_config.h	/^typedef intptr_t        ngx_int_t;$/;"	t
 ngx_libc_cdecl	src/core/ngx_config.h	74;"	d
+ngx_list_create	src/core/ngx_list.c	/^ngx_list_create(ngx_pool_t *pool, ngx_uint_t n, size_t size)$/;"	f
+ngx_list_init	src/core/ngx_list.h	/^ngx_list_init(ngx_list_t *list, ngx_pool_t *pool, ngx_uint_t n, size_t size)$/;"	f
+ngx_list_part_s	src/core/ngx_list.h	/^struct ngx_list_part_s {$/;"	s
+ngx_list_part_t	src/core/ngx_list.h	/^typedef struct ngx_list_part_s  ngx_list_part_t;$/;"	t	typeref:struct:ngx_list_part_s
+ngx_list_push	src/core/ngx_list.c	/^ngx_list_push(ngx_list_t *l)$/;"	f
+ngx_list_t	src/core/ngx_list.h	/^} ngx_list_t;$/;"	t	typeref:struct:__anon7
+ngx_log	src/core/ngx_log.c	/^static ngx_log_t        ngx_log;$/;"	v	file:
+ngx_log_abort	src/core/ngx_log.c	/^ngx_log_abort(ngx_err_t err, const char *fmt, ...)$/;"	f
+ngx_log_debug	src/core/ngx_log.h	107;"	d
+ngx_log_debug	src/core/ngx_log.h	91;"	d
+ngx_log_debug0	src/core/ngx_log.h	134;"	d
+ngx_log_debug0	src/core/ngx_log.h	170;"	d
+ngx_log_debug0	src/core/ngx_log.h	215;"	d
+ngx_log_debug1	src/core/ngx_log.h	137;"	d
+ngx_log_debug1	src/core/ngx_log.h	174;"	d
+ngx_log_debug1	src/core/ngx_log.h	216;"	d
+ngx_log_debug2	src/core/ngx_log.h	140;"	d
+ngx_log_debug2	src/core/ngx_log.h	178;"	d
+ngx_log_debug2	src/core/ngx_log.h	217;"	d
+ngx_log_debug3	src/core/ngx_log.h	143;"	d
+ngx_log_debug3	src/core/ngx_log.h	182;"	d
+ngx_log_debug3	src/core/ngx_log.h	218;"	d
+ngx_log_debug4	src/core/ngx_log.h	146;"	d
+ngx_log_debug4	src/core/ngx_log.h	186;"	d
+ngx_log_debug4	src/core/ngx_log.h	219;"	d
+ngx_log_debug5	src/core/ngx_log.h	149;"	d
+ngx_log_debug5	src/core/ngx_log.h	190;"	d
+ngx_log_debug5	src/core/ngx_log.h	220;"	d
+ngx_log_debug6	src/core/ngx_log.h	152;"	d
+ngx_log_debug6	src/core/ngx_log.h	194;"	d
+ngx_log_debug6	src/core/ngx_log.h	221;"	d
+ngx_log_debug7	src/core/ngx_log.h	157;"	d
+ngx_log_debug7	src/core/ngx_log.h	199;"	d
+ngx_log_debug7	src/core/ngx_log.h	222;"	d
+ngx_log_debug8	src/core/ngx_log.h	162;"	d
+ngx_log_debug8	src/core/ngx_log.h	205;"	d
+ngx_log_debug8	src/core/ngx_log.h	224;"	d
+ngx_log_debug_core	src/core/ngx_log.c	/^ngx_log_debug_core(ngx_log_t *log, ngx_err_t err, const char *fmt, ...)$/;"	f
+ngx_log_errno	src/core/ngx_log.c	/^ngx_log_errno(u_char *buf, u_char *last, ngx_err_t err)$/;"	f
+ngx_log_error	src/core/ngx_log.c	/^ngx_log_error(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,$/;"	f
+ngx_log_error	src/core/ngx_log.h	101;"	d
+ngx_log_error	src/core/ngx_log.h	85;"	d
+ngx_log_error_core	src/core/ngx_log.c	/^ngx_log_error_core(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,$/;"	f
+ngx_log_file	src/core/ngx_log.c	/^static ngx_open_file_t  ngx_log_file;$/;"	v	file:
+ngx_log_get_file_log	src/core/ngx_log.c	/^ngx_log_get_file_log(ngx_log_t *head)$/;"	f
+ngx_log_handler_pt	src/core/ngx_log.h	/^typedef u_char *(*ngx_log_handler_pt) (ngx_log_t *log, u_char *buf, size_t len);$/;"	t
+ngx_log_init	src/core/ngx_log.c	/^ngx_log_init(u_char *prefix)$/;"	f
+ngx_log_insert	src/core/ngx_log.c	/^ngx_log_insert(ngx_log_t *log, ngx_log_t *new_log)$/;"	f	file:
+ngx_log_memory_buf_t	src/core/ngx_log.c	/^} ngx_log_memory_buf_t;$/;"	t	typeref:struct:__anon5	file:
+ngx_log_memory_cleanup	src/core/ngx_log.c	/^ngx_log_memory_cleanup(void *data)$/;"	f	file:
+ngx_log_memory_writer	src/core/ngx_log.c	/^ngx_log_memory_writer(ngx_log_t *log, ngx_uint_t level, u_char *buf,$/;"	f	file:
+ngx_log_open_default	src/core/ngx_log.c	/^ngx_log_open_default(ngx_cycle_t *cycle)$/;"	f
+ngx_log_redirect_stderr	src/core/ngx_log.c	/^ngx_log_redirect_stderr(ngx_cycle_t *cycle)$/;"	f
+ngx_log_s	src/core/ngx_log.h	/^struct ngx_log_s {$/;"	s
+ngx_log_set_levels	src/core/ngx_log.c	/^ngx_log_set_levels(ngx_conf_t *cf, ngx_log_t *log)$/;"	f	file:
+ngx_log_set_log	src/core/ngx_log.c	/^ngx_log_set_log(ngx_conf_t *cf, ngx_log_t **head)$/;"	f
+ngx_log_stderr	src/core/ngx_log.c	/^ngx_log_stderr(ngx_err_t err, const char *fmt, ...)$/;"	f
 ngx_log_t	src/core/ngx_core.h	/^typedef struct ngx_log_s             ngx_log_t;$/;"	t	typeref:struct:ngx_log_s
+ngx_log_writer_pt	src/core/ngx_log.h	/^typedef void (*ngx_log_writer_pt) (ngx_log_t *log, ngx_uint_t level,$/;"	t
 ngx_max	src/core/ngx_core.h	100;"	d
+ngx_memalign	src/os/unix/ngx_alloc.c	/^ngx_memalign(size_t alignment, size_t size, ngx_log_t *log)$/;"	f
+ngx_memalign	src/os/unix/ngx_alloc.h	35;"	d
 ngx_min	src/core/ngx_core.h	101;"	d
 ngx_module_t	src/core/ngx_core.h	/^typedef struct ngx_module_s          ngx_module_t;$/;"	t	typeref:struct:ngx_module_s
 ngx_open_file_t	src/core/ngx_core.h	/^typedef struct ngx_open_file_s       ngx_open_file_t;$/;"	t	typeref:struct:ngx_open_file_s
+ngx_output_chain_aio_pt	src/core/ngx_buf.h	/^typedef void (*ngx_output_chain_aio_pt)(ngx_output_chain_ctx_t *ctx,$/;"	t
+ngx_output_chain_ctx_s	src/core/ngx_buf.h	/^struct ngx_output_chain_ctx_s {$/;"	s
+ngx_output_chain_ctx_t	src/core/ngx_buf.h	/^typedef struct ngx_output_chain_ctx_s  ngx_output_chain_ctx_t;$/;"	t	typeref:struct:ngx_output_chain_ctx_s
+ngx_output_chain_filter_pt	src/core/ngx_buf.h	/^typedef ngx_int_t (*ngx_output_chain_filter_pt)(void *ctx, ngx_chain_t *in);$/;"	t
+ngx_pagesize	src/os/unix/ngx_alloc.c	/^ngx_uint_t  ngx_pagesize;$/;"	v
+ngx_pagesize_shift	src/os/unix/ngx_alloc.c	/^ngx_uint_t  ngx_pagesize_shift;$/;"	v
+ngx_palloc	src/core/ngx_palloc.c	/^ngx_palloc(ngx_pool_t *pool, size_t size)$/;"	f
+ngx_palloc_block	src/core/ngx_palloc.c	/^ngx_palloc_block(ngx_pool_t *pool, size_t size)$/;"	f	file:
+ngx_palloc_large	src/core/ngx_palloc.c	/^ngx_palloc_large(ngx_pool_t *pool, size_t size)$/;"	f	file:
+ngx_palloc_small	src/core/ngx_palloc.c	/^ngx_palloc_small(ngx_pool_t *pool, size_t size, ngx_uint_t align)$/;"	f	file:
+ngx_pcalloc	src/core/ngx_palloc.c	/^ngx_pcalloc(ngx_pool_t *pool, size_t size)$/;"	f
+ngx_pfree	src/core/ngx_palloc.c	/^ngx_pfree(ngx_pool_t *pool, void *p)$/;"	f
+ngx_pmemalign	src/core/ngx_palloc.c	/^ngx_pmemalign(ngx_pool_t *pool, size_t size, size_t alignment)$/;"	f
+ngx_pnalloc	src/core/ngx_palloc.c	/^ngx_pnalloc(ngx_pool_t *pool, size_t size)$/;"	f
+ngx_pool_cleanup_add	src/core/ngx_palloc.c	/^ngx_pool_cleanup_add(ngx_pool_t *p, size_t size)$/;"	f
+ngx_pool_cleanup_file	src/core/ngx_palloc.c	/^ngx_pool_cleanup_file(void *data)$/;"	f
+ngx_pool_cleanup_file_t	src/core/ngx_palloc.h	/^} ngx_pool_cleanup_file_t;$/;"	t	typeref:struct:__anon2
+ngx_pool_cleanup_pt	src/core/ngx_palloc.h	/^typedef void (*ngx_pool_cleanup_pt)(void *data);$/;"	t
+ngx_pool_cleanup_s	src/core/ngx_palloc.h	/^struct ngx_pool_cleanup_s {$/;"	s
+ngx_pool_cleanup_t	src/core/ngx_palloc.h	/^typedef struct ngx_pool_cleanup_s  ngx_pool_cleanup_t;$/;"	t	typeref:struct:ngx_pool_cleanup_s
+ngx_pool_data_t	src/core/ngx_palloc.h	/^} ngx_pool_data_t;$/;"	t	typeref:struct:__anon1
+ngx_pool_delete_file	src/core/ngx_palloc.c	/^ngx_pool_delete_file(void *data)$/;"	f
+ngx_pool_large_s	src/core/ngx_palloc.h	/^struct ngx_pool_large_s {$/;"	s
+ngx_pool_large_t	src/core/ngx_palloc.h	/^typedef struct ngx_pool_large_s  ngx_pool_large_t;$/;"	t	typeref:struct:ngx_pool_large_s
+ngx_pool_run_cleanup_file	src/core/ngx_palloc.c	/^ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd)$/;"	f
+ngx_pool_s	src/core/ngx_palloc.h	/^struct ngx_pool_s {$/;"	s
 ngx_pool_t	src/core/ngx_core.h	/^typedef struct ngx_pool_s            ngx_pool_t;$/;"	t	typeref:struct:ngx_pool_s
 ngx_random	src/core/ngx_config.h	57;"	d
+ngx_reset_pool	src/core/ngx_palloc.c	/^ngx_reset_pool(ngx_pool_t *pool)$/;"	f
 ngx_signal_helper	src/core/ngx_config.h	54;"	d
 ngx_signal_value	src/core/ngx_config.h	55;"	d
 ngx_ssl_connection_t	src/core/ngx_core.h	/^typedef struct ngx_ssl_connection_s  ngx_ssl_connection_t;$/;"	t	typeref:struct:ngx_ssl_connection_s
 ngx_ssl_t	src/core/ngx_core.h	/^typedef struct ngx_ssl_s             ngx_ssl_t;$/;"	t	typeref:struct:ngx_ssl_s
 ngx_thread_task_t	src/core/ngx_core.h	/^typedef struct ngx_thread_task_s     ngx_thread_task_t;$/;"	t	typeref:struct:ngx_thread_task_s
 ngx_uint_t	src/core/ngx_config.h	/^typedef uintptr_t       ngx_uint_t;$/;"	t
+ngx_use_stderr	src/core/ngx_log.c	/^ngx_uint_t              ngx_use_stderr = 1;$/;"	v
+ngx_write_stderr	src/core/ngx_log.h	/^ngx_write_stderr(char *text)$/;"	f
+ngx_write_stdout	src/core/ngx_log.h	/^ngx_write_stdout(char *text)$/;"	f
+num	src/core/ngx_buf.h	/^    \/* STUB *\/ int   num;$/;"	m	struct:ngx_buf_s
+num	src/core/ngx_buf.h	/^    ngx_int_t    num;$/;"	m	struct:__anon3
+out	src/core/ngx_buf.h	/^    ngx_chain_t                 *out;$/;"	m	struct:__anon4
+output_filter	src/core/ngx_buf.h	/^    ngx_output_chain_filter_pt   output_filter;$/;"	m	struct:ngx_output_chain_ctx_s
+part	src/core/ngx_list.h	/^    ngx_list_part_t   part;$/;"	m	struct:__anon7
+pool	src/core/ngx_array.h	/^    ngx_pool_t  *pool;$/;"	m	struct:__anon6
+pool	src/core/ngx_buf.h	/^    ngx_pool_t                  *pool;$/;"	m	struct:__anon4
+pool	src/core/ngx_buf.h	/^    ngx_pool_t                  *pool;$/;"	m	struct:ngx_output_chain_ctx_s
+pool	src/core/ngx_list.h	/^    ngx_pool_t       *pool;$/;"	m	struct:__anon7
+pos	src/core/ngx_buf.h	/^    u_char          *pos;$/;"	m	struct:ngx_buf_s
+pos	src/core/ngx_log.c	/^    u_char        *pos;$/;"	m	struct:__anon5	file:
+recycled	src/core/ngx_buf.h	/^    unsigned         recycled:1;$/;"	m	struct:ngx_buf_s
+sendfile	src/core/ngx_buf.h	/^    unsigned                     sendfile:1;$/;"	m	struct:ngx_output_chain_ctx_s
+shadow	src/core/ngx_buf.h	/^    ngx_buf_t       *shadow;$/;"	m	struct:ngx_buf_s
+size	src/core/ngx_array.h	/^    size_t       size;$/;"	m	struct:__anon6
+size	src/core/ngx_buf.h	/^    size_t       size;$/;"	m	struct:__anon3
+size	src/core/ngx_list.h	/^    size_t            size;$/;"	m	struct:__anon7
+start	src/core/ngx_buf.h	/^    u_char          *start;         \/* start of buffer *\/$/;"	m	struct:ngx_buf_s
+start	src/core/ngx_log.c	/^    u_char        *start;$/;"	m	struct:__anon5	file:
+sync	src/core/ngx_buf.h	/^    unsigned         sync:1;$/;"	m	struct:ngx_buf_s
+tag	src/core/ngx_buf.h	/^    ngx_buf_tag_t                tag;$/;"	m	struct:ngx_output_chain_ctx_s
+tag	src/core/ngx_buf.h	/^    ngx_buf_tag_t    tag;$/;"	m	struct:ngx_buf_s
+temp_file	src/core/ngx_buf.h	/^    unsigned         temp_file:1;$/;"	m	struct:ngx_buf_s
+temporary	src/core/ngx_buf.h	/^    unsigned         temporary:1;$/;"	m	struct:ngx_buf_s
+thread_handler	src/core/ngx_buf.h	/^    ngx_int_t                  (*thread_handler)(ngx_thread_task_t *task,$/;"	m	struct:ngx_output_chain_ctx_s
+thread_task	src/core/ngx_buf.h	/^    ngx_thread_task_t           *thread_task;$/;"	m	struct:ngx_output_chain_ctx_s
+unaligned	src/core/ngx_buf.h	/^    unsigned                     unaligned:1;$/;"	m	struct:ngx_output_chain_ctx_s
+wdata	src/core/ngx_log.h	/^    void                *wdata;$/;"	m	struct:ngx_log_s
+writer	src/core/ngx_log.h	/^    ngx_log_writer_pt    writer;$/;"	m	struct:ngx_log_s
+written	src/core/ngx_log.c	/^    ngx_atomic_t   written;$/;"	m	struct:__anon5	file:
