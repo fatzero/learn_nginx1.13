@@ -264,6 +264,86 @@ found:
 }
 
 
+ngx_int_t
+ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
+    ngx_uint_t nelts)
+{
+    size_t                len, dot_len;
+    ngx_uint_t            i, n, dot;
+    ngx_array_t           curr_names, next_names;
+    ngx_hash_key_t       *name, *next_name;
+    ngx_hash_init_t       h;
+    ngx_hash_wildcard_t  *wdc;
+
+    if (ngx_array_init(&curr_names, hinit->temp_pool, nelts,
+                       sizeof(ngx_hash_key_t))
+        != NGX_OK)
+    {
+        return NGX_ERROR;
+    }
+
+    if (ngx_array_init(&next_names, hinit->temp_pool, nelts,
+                       sizeof(ngx_hash_key_t))
+        != NGX_OK)
+    {
+        return NGX_ERROR;
+    }
+
+    for (n = 0; n < nelts; n = i) {
+
+#if 0
+        ngx_log_error(NGX_LOG_ALERT, hinit->pool->log, 0,
+                      "wc0: \"%V\"", &names[n].key);
+#endif
+
+        dot = 0;
+
+        for (len = 0; len < names[n].key.len; len++) {
+            if (names[n].key.data[len] == '.') {
+                dot = 1;
+                break;
+            }
+        }
+
+        name = ngx_array_push(&curr_names);
+        if (name == NULL) {
+            return NGX_ERROR;
+        }
+
+        name->key.len = len;
+        name->key.data = names[n].key.data;
+        name->key_hash = hinit->key(names[n].key.data, names[n].key.len);
+        name->value = names[n].value;
+        
+#if 0
+        ngx_log_error(NGX_LOG_ALERT, hinit->pool->log, 0,
+                      "wc1: \"%V\" %ui", &name->key, dot);
+#endif
+
+        dot_len = len + 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ngx_uint_t
 ngx_hash_key(u_char *data, size_t len)
 {
