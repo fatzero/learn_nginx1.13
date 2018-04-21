@@ -45,7 +45,7 @@ NGX_DONE	src/core/ngx_core.h	39;"	d
 NGX_ERROR	src/core/ngx_core.h	36;"	d
 NGX_ERROR_LOG_PATH	objs/ngx_auto_config.h	402;"	d
 NGX_GROUP	objs/ngx_auto_config.h	452;"	d
-NGX_HASH_ELT_SIZE	src/core/ngx_hash.c	52;"	d	file:
+NGX_HASH_ELT_SIZE	src/core/ngx_hash.c	148;"	d	file:
 NGX_HASH_LARGE	src/core/ngx_hash.h	66;"	d
 NGX_HASH_LARGE_ASIZE	src/core/ngx_hash.h	68;"	d
 NGX_HASH_LARGE_HSIZE	src/core/ngx_hash.h	69;"	d
@@ -368,11 +368,15 @@ ngx_hash	src/core/ngx_hash.h	111;"	d
 ngx_hash_combined_t	src/core/ngx_hash.h	/^} ngx_hash_combined_t;$/;"	t	typeref:struct:__anon9
 ngx_hash_elt_t	src/core/ngx_hash.h	/^} ngx_hash_elt_t;$/;"	t	typeref:struct:__anon5
 ngx_hash_find	src/core/ngx_hash.c	/^ngx_hash_find(ngx_hash_t *hash, ngx_uint_t key, u_char *name, size_t len)$/;"	f
+ngx_hash_find_wc_head	src/core/ngx_hash.c	/^ngx_hash_find_wc_head(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)$/;"	f
 ngx_hash_init	src/core/ngx_hash.c	/^ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts)$/;"	f
 ngx_hash_init_t	src/core/ngx_hash.h	/^} ngx_hash_init_t;$/;"	t	typeref:struct:__anon10
+ngx_hash_key	src/core/ngx_hash.c	/^ngx_hash_key(u_char *data, size_t len)$/;"	f
+ngx_hash_key_lc	src/core/ngx_hash.c	/^ngx_hash_key_lc(u_char *data, size_t len)$/;"	f
 ngx_hash_key_pt	src/core/ngx_hash.h	/^typedef ngx_uint_t (*ngx_hash_key_pt) (u_char *data, size_t len);$/;"	t
 ngx_hash_key_t	src/core/ngx_hash.h	/^} ngx_hash_key_t;$/;"	t	typeref:struct:__anon8
 ngx_hash_keys_arrays_t	src/core/ngx_hash.h	/^} ngx_hash_keys_arrays_t;$/;"	t	typeref:struct:__anon11
+ngx_hash_strlow	src/core/ngx_hash.c	/^ngx_hash_strlow(u_char *dst, u_char *src, size_t n)$/;"	f
 ngx_hash_t	src/core/ngx_hash.h	/^} ngx_hash_t;$/;"	t	typeref:struct:__anon6
 ngx_hash_wildcard_init	src/core/ngx_hash.c	/^ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,$/;"	f
 ngx_hash_wildcard_t	src/core/ngx_hash.h	/^} ngx_hash_wildcard_t;$/;"	t	typeref:struct:__anon7
