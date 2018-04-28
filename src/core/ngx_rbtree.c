@@ -260,7 +260,25 @@ ngx_rbtree_delete(ngx_rbtree_t *tree, ngx_rbtree_node_t *node)
             w = temp->parent->right;
 
             if (ngx_rbt_is_red(w)) {
+                ngx_rbt_black(w);
+                ngx_rbt_red(temp->parent);
+                ngx_rbtree_left_rotate(root, sentinel, temp->parent);
+                w = temp->parent->right;
+            }
 
+            if (ngx_rbt_is_black(w->left) && ngx_rbt_is_black(w->right)) {
+                ngx_rbt_red(w);
+                temp = temp->parent;
+
+            } else {
+                if (ngx_rbt_is_black(w->right)) {
+                    ngx_rbt_black(w->left);
+                    ngx_rbt_red(w);
+                    ngx_rbtree_right_rotate(root, sentinel, w);
+                    w = temp->parent->right;
+                }
+
+                
     
         
     
