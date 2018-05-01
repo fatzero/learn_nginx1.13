@@ -114,3 +114,156 @@ ngx_sprintf(u_char *buf, const char *fmt, ...)
     return p;
 }
 
+
+u_char * ngx_cdecl
+ngx_snprintf(u_char *buf, size_t max, const char *fmt, ...)
+{
+    u_char    *p;
+    va_list    args;
+
+    va_start(args, fmt);
+    p = ngx_vslprintf(buf, buf + max, fmt, args);
+    va_end(args);
+
+    return p;
+}
+
+
+u_char * ngx_cdecl
+ngx_slprintf(u_char *buf, u_char *last, const char *fmt, ...)
+{
+    u_char    *p;
+    va_list    args;
+
+    va_start(args, fmt);
+    p = ngx_vslprintf(buf, last, fmt, args);
+    va_end(args);
+
+    return p;
+}
+
+
+u_char *
+ngx_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)
+{
+    u_char                *p, zero;
+    int                    d;
+    double                 f;
+    size_t                 len, slen;
+    int64_t                i64;
+    uint64_t               ui64, frac;
+    ngx_msec_t             ms;
+    ngx_uint_t             width, sign, hex, max_width, frac_width, scale, n;
+    ngx_str_t             *v;
+    ngx_variable_value_t  *vv;
+
+    while (*fmt && buf < last) {
+
+        /*
+         * "buf < last" means that we could copy at least one character:
+         * the plain character, "%%", "%c", and minus without the checking
+         */
+
+        if (*fmt == '%') {
+
+            i64 = 0;
+            ui64 = 0;
+
+            zero = (u_char) ((*++fmt == '0') ? '0' : ' ');
+            width = 0;
+            sign = 1;
+            hex = 0;
+            max_width = 0;
+            frac_width = 0;
+            slen = (size_t) -1; 
+
+            while (*fmt >= '0' && *fmt <= '9') {
+                width += width * 10 + *fmt++ - '0';
+            }
+
+            for ( ;; ) {
+                switch (*fmt) {
+
+                    case 'u':
+                        sign = 0;
+                        fmt++;
+                        continue;
+
+                    case 'm':
+                        max_width = 1;
+                        fmt++;
+                        continue;
+
+                    case 'X':
+                        hex = 2;
+                        sign = 0;
+                        fmt++;
+                        continue;
+
+                    case 'x':
+                        hex = 1;
+                        sign = 0;
+                        fmt++;
+                        continue;
+
+                    case '.':
+                        fmt++;
+
+                        while (*fmt >= '0' && *fmt <= '9') {
+                            frac_width += frac_width * 10 + *fmt++ - '0';
+                        }
+
+                        break;
+
+                    case '*':
+                        slen = va_arg(args, size_t);
+                        fmt++;
+                        continue;
+
+                    default:
+                        break;
+                }
+
+                break;
+            }
+
+
+            switch (*fmt) {
+
+                case 'V':
+                    v = va_arg(args, ngx_str_t *);
+
+                    len = ngx_min(((size_t) (last - buf)), v->len);    
+                    buf = ngx_memcpy(buf, v->data, len);
+                    fmt++;
+
+                    continue;
+
+                case 'v':
+                    vv = va_arg(args, ngx_variable_value_t *);
+
+                    len = ngx_min(((size_t) (last - buf)), vv->len);
+                    buf = ngx_memcpy(buf, vv->data, len);
+                    fmt++;
+
+                    continue;
+
+
+                case 's':
+                    p = va_arg(args, u_char *);
+                    
+                    if (slen == (size_t) -1) {
+                        while (*p && buf < last) {
+                            *buf++ = *p++;
+                        }
+
+                    } else {
+                        len = ngx_min(((size_t) (last - buf)), slen);
+                        buf = ngx_cpymem(buf, p, len);
+                    }
+
+                    fmt++;
+
+                    continue;
+
+
