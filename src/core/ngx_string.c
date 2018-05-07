@@ -767,6 +767,20 @@ ngx_rstrncmp(u_char *s1, u_char *s2, size_t n)
 }
 
 
+ngx_int_t
+ngx_rstrncasecmp(u_char *s1, u_char *s2, size_t n)
+{
+    u_char  c1, c2;
+
+    if (n == 0) {
+        return 0;
+    }
+
+    n--;
+
+    for ( ;; ) {
+        c1 = s1[n];
+
 
 
 
