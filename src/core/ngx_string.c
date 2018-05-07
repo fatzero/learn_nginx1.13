@@ -777,13 +777,7 @@ ngx_rstrncasecmp(u_char *s1, u_char *s2, size_t n)
     }
 
     n--;
-<<<<<<< HEAD
 
-    for ( ;; ) {
-        c1 = s1[n];
-
-=======
-    
     for ( ;; ) {
         c1 = s1[n];
         if (c1 >= 'a' && c1 <= 'z') {
