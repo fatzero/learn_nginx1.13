@@ -767,8 +767,63 @@ ngx_rstrncmp(u_char *s1, u_char *s2, size_t n)
 }
 
 
+ngx_int_t
+ngx_rstrncasecmp(u_char *s1, u_char *s2, size_t n)
+{
+    u_char  c1, c2;
+
+    if (n == 0) {
+        return 0;
+    }
+
+    n--;
+    
+    for ( ;; ) {
+        c1 = s1[n];
+        if (c1 >= 'a' && c1 <= 'z') {
+            c1 -= 'a' - 'A';
+        }
+
+        c2 = s2[n];
+        if (c2 >= 'a' && c2 <= 'z') {
+            c2 -= 'a'- 'A';
+        }
+
+        if (c1 != c2) {
+            return c1 - c2;
+        }
+
+        if (n == 0) {
+            return 0;
+        }
+
+        n--;
+    }
+}
 
 
+ngx_int_t
+ngx_memn2cmp(u_char *s1, u_char *s2, size_t n1, size_t n2)
+{
+    size_t     n;
+    ngx_int_t  m, z;
+
+    if (n1 <= n2) {
+        n = n1;
+        z = -1;
+    } else {
+        n = n2;
+        z = 1;
+    }
+
+    m = ngx_memcmp(s1, s2, n);
+
+    if (m || n1 == n2) {
+        return m;
+    }
+
+    return z;
+}
 
 
 
