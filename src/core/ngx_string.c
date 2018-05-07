@@ -800,7 +800,6 @@ ngx_rstrncasecmp(u_char *s1, u_char *s2, size_t n)
         n--;
     }
 }
->>>>>>> b0278a82ee642b44809526efd8cf9983c0979b4b
 
 
 ngx_int_t
