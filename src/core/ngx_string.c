@@ -811,6 +811,7 @@ ngx_memn2cmp(u_char *s1, u_char *s2, size_t n1, size_t n2)
     if (n1 <= n2) {
         n = n1;
         z = -1;
+
     } else {
         n = n2;
         z = 1;
@@ -826,9 +827,315 @@ ngx_memn2cmp(u_char *s1, u_char *s2, size_t n1, size_t n2)
 }
 
 
+ngx_int_t
+ngx_dns_strcmp(u_char *s1, u_char *s2)
+{
+    ngx_uint_t  c1, c2;
+
+    for ( ;; ) {
+        c1 = (ngx_uint_t) *s1++;
+        c2 = (ngx_uint_t) *s2++;
+
+        c1 = (c1 >= 'A' && c1 <= 'Z') ? (c1 | 0x20) : c1;
+        c2 = (c2 >= 'A' && c2 <= 'Z') ? (c2 | 0x20) : c2;
+
+        if (c1 == c2) {
+
+            if (c1) {
+                continue;
+            }
+
+            return 0;
+        }
+
+        /* in ASCII '.' > '-', but we need '.' to be the lowest character */
+
+        c1 = (c1 == '.') ? ' ' : c1;
+        c2 = (c2 == '.') ? ' ' : c2;
+
+        return c1 - c2;
+    }
+}
 
 
+ngx_int_t
+ngx_filename_cmp(u_char *s1, u_char *s2, size_t n)
+{
+    ngx_uint_t  c1, c2;
 
+    while(n) {
+        c1 = (ngx_uint_t) *s1++;
+        c2 = (ngx_uint_t) *s2++;
+
+#if (NGX_HAVE_CASELESS_FILESYSTEM)
+        c1 = ngx_tolower(c1);
+        c2 = ngx_tolower(c2);
+#endif
+
+        if (c1 == c2) {
+
+            if (c1) {
+                --n;
+                continue;
+            }
+
+            return 0;
+        }
+
+        /* we need '/' to be the lowest character */
+
+        if (c1 == 0 || c2 == 0){
+            return c1 - c2;
+        }
+
+        c1 = (c1 == '/') ? 0 : c1;
+        c2 = (c2 == '/') ? 0 : c2;
+
+        return c1 - c2;
+    }
+
+    return 0;
+}
+
+
+ngx_int_t
+ngx_atoi(u_char *line, size_t n)
+{
+    ngx_int_t  value, cutoff, cutlim;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+    cutlim = NGX_MAX_INT_T_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+/* parse a fixed point number, e.g, ngx_atofp("10.5", 4, 2) returns 1050 */
+
+ngx_int_t
+ngx_atofp(u_char *line, size_t n, size_t point)
+{
+    ngx_int_t   value, cutoff, cutlim;
+    ngx_uint_t  dot;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+    cutlim = NGX_MAX_INT_T_VALUE % 10;
+
+    dot = 0;
+
+    for (value = 0; n--; line++) {
+
+        if (point == 0) {
+            return NGX_ERROR;
+        }
+
+        if (*line == '.') {
+            if (dot) {
+                return NGX_ERROR;
+            }
+
+            dot = 1;
+            continue;
+        }
+
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+        point -= dot;
+    }
+
+    while (point--) {
+        if (value > cutoff) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10;
+    }
+
+    return value;
+}
+
+
+ngx_ssize_t
+ngx_atosz(u_char *line, size_t n)
+{
+    ngx_ssize_t  value, cutoff, cutlim;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_SIZE_T_VALUE / 10;
+    cutlim = NGX_MAX_SIZE_T_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+off_t
+ngx_atoof(u_char *line, size_t n)
+{
+    off_t  value, cutoff, cutlim;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_OFF_T_VALUE / 10;
+    cutlim = NGX_MAX_OFF_T_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+time_t
+ngx_atotm(u_char *line, size_t n)
+{
+    time_t  value, cutoff, cutlim;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_TIME_T_VALUE / 10;
+    cutlim = NGX_MAX_TIME_t_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+ngx_int_t
+ngx_hextoi(u_char *line, size_t n)
+{
+    u_char     c, ch;
+    ngx_int_t  value, cutoff;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+
+    for (value = 0; n--; line++) {
+        if (value > cutoff) {
+            return NGX_ERROR;
+        }
+
+        ch = *line;
+
+        if (ch >= '0' && ch <= '9') {
+            value = value * 16 + (ch - '0');
+            continue;
+        }
+
+        c = (u_char) (ch | 0x20);
+
+        if (c >= 'a' && c <= 'f') {
+            value = value * 16 + (c - 'a');
+            continue;
+        }
+
+        return NGX_ERROR;
+    }
+
+    return value;
+}
+
+
+u_char *
+ngx_hex_dump(u_char *dst, u_char *src, size_t len)
+{
+    static u_char hex[] = "0123456789abcdef";
+
+    while (len--) {
+        *dst++ = hex[*src >> 4];
+        *dst++ = hex[*src++ & 0xf];
+    }
+
+    return dst;
+}
+
+
+void
+ngx_encode_base64(ngx_str_t *dst, ngx_str_t *src)
+{
+    static u_char   basis64[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    ngx_encode_base64_internal(dst, src, basis64, 1);
+}
+
+
+void
+ngx_encode_base64url(ngx_str_t *dst, ngx_str_t *src)
+{
+    static u_char   basis64[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+    ngx_encode_base64_internal(dst, src, basis64, 0);
+}
 
 
 
