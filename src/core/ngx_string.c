@@ -811,6 +811,7 @@ ngx_memn2cmp(u_char *s1, u_char *s2, size_t n1, size_t n2)
     if (n1 <= n2) {
         n = n1;
         z = -1;
+
     } else {
         n = n2;
         z = 1;
@@ -826,9 +827,596 @@ ngx_memn2cmp(u_char *s1, u_char *s2, size_t n1, size_t n2)
 }
 
 
+ngx_int_t
+ngx_dns_strcmp(u_char *s1, u_char *s2)
+{
+    ngx_uint_t  c1, c2;
+
+    for ( ;; ) {
+        c1 = (ngx_uint_t) *s1++;
+        c2 = (ngx_uint_t) *s2++;
+
+        c1 = (c1 >= 'A' && c1 <= 'Z') ? (c1 | 0x20) : c1;
+        c2 = (c2 >= 'A' && c2 <= 'Z') ? (c2 | 0x20) : c2;
+
+        if (c1 == c2) {
+
+            if (c1) {
+                continue;
+            }
+
+            return 0;
+        }
+
+        /* in ASCII '.' > '-', but we need '.' to be the lowest character */
+
+        c1 = (c1 == '.') ? ' ' : c1;
+        c2 = (c2 == '.') ? ' ' : c2;
+
+        return c1 - c2;
+    }
+}
 
 
+ngx_int_t
+ngx_filename_cmp(u_char *s1, u_char *s2, size_t n)
+{
+    ngx_uint_t  c1, c2;
+
+    while(n) {
+        c1 = (ngx_uint_t) *s1++;
+        c2 = (ngx_uint_t) *s2++;
+
+#if (NGX_HAVE_CASELESS_FILESYSTEM)
+        c1 = ngx_tolower(c1);
+        c2 = ngx_tolower(c2);
+#endif
+
+        if (c1 == c2) {
+
+            if (c1) {
+                --n;
+                continue;
+            }
+
+            return 0;
+        }
+
+        /* we need '/' to be the lowest character */
+
+        if (c1 == 0 || c2 == 0){
+            return c1 - c2;
+        }
+
+        c1 = (c1 == '/') ? 0 : c1;
+        c2 = (c2 == '/') ? 0 : c2;
+
+        return c1 - c2;
+    }
+
+    return 0;
+}
 
 
+ngx_int_t
+ngx_atoi(u_char *line, size_t n)
+{
+    ngx_int_t  value, cutoff, cutlim;
 
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+    cutlim = NGX_MAX_INT_T_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+/* parse a fixed point number, e.g, ngx_atofp("10.5", 4, 2) returns 1050 */
+
+ngx_int_t
+ngx_atofp(u_char *line, size_t n, size_t point)
+{
+    ngx_int_t   value, cutoff, cutlim;
+    ngx_uint_t  dot;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+    cutlim = NGX_MAX_INT_T_VALUE % 10;
+
+    dot = 0;
+
+    for (value = 0; n--; line++) {
+
+        if (point == 0) {
+            return NGX_ERROR;
+        }
+
+        if (*line == '.') {
+            if (dot) {
+                return NGX_ERROR;
+            }
+
+            dot = 1;
+            continue;
+        }
+
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+        point -= dot;
+    }
+
+    while (point--) {
+        if (value > cutoff) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10;
+    }
+
+    return value;
+}
+
+
+ngx_ssize_t
+ngx_atosz(u_char *line, size_t n)
+{
+    ngx_ssize_t  value, cutoff, cutlim;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_SIZE_T_VALUE / 10;
+    cutlim = NGX_MAX_SIZE_T_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+off_t
+ngx_atoof(u_char *line, size_t n)
+{
+    off_t  value, cutoff, cutlim;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_OFF_T_VALUE / 10;
+    cutlim = NGX_MAX_OFF_T_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+time_t
+ngx_atotm(u_char *line, size_t n)
+{
+    time_t  value, cutoff, cutlim;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_TIME_T_VALUE / 10;
+    cutlim = NGX_MAX_TIME_t_VALUE % 10;
+
+    for (value = 0; n--; line++) {
+        if (*line < '0' || *line > '9') {
+            return NGX_ERROR;
+        }
+
+        if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
+            return NGX_ERROR;
+        }
+
+        value = value * 10 + (*line - '0');
+    }
+
+    return value;
+}
+
+
+ngx_int_t
+ngx_hextoi(u_char *line, size_t n)
+{
+    u_char     c, ch;
+    ngx_int_t  value, cutoff;
+
+    if (n == 0) {
+        return NGX_ERROR;
+    }
+
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+
+    for (value = 0; n--; line++) {
+        if (value > cutoff) {
+            return NGX_ERROR;
+        }
+
+        ch = *line;
+
+        if (ch >= '0' && ch <= '9') {
+            value = value * 16 + (ch - '0');
+            continue;
+        }
+
+        c = (u_char) (ch | 0x20);
+
+        if (c >= 'a' && c <= 'f') {
+            value = value * 16 + (c - 'a');
+            continue;
+        }
+
+        return NGX_ERROR;
+    }
+
+    return value;
+}
+
+
+u_char *
+ngx_hex_dump(u_char *dst, u_char *src, size_t len)
+{
+    static u_char hex[] = "0123456789abcdef";
+
+    while (len--) {
+        *dst++ = hex[*src >> 4];
+        *dst++ = hex[*src++ & 0xf];
+    }
+
+    return dst;
+}
+
+
+void
+ngx_encode_base64(ngx_str_t *dst, ngx_str_t *src)
+{
+    static u_char   basis64[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    ngx_encode_base64_internal(dst, src, basis64, 1);
+}
+
+
+void
+ngx_encode_base64url(ngx_str_t *dst, ngx_str_t *src)
+{
+    static u_char   basis64[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+    ngx_encode_base64_internal(dst, src, basis64, 0);
+}
+
+
+static void
+ngx_encode_base64_internal(ngx_str_t *dst, ngx_str_t *src, u_char *basis,
+    ngx_uint_t padding)
+{
+    u_char         *d, *s;
+    size_t          len;
+
+    len = src->len;
+    s = src->data;
+    d = dst->data;
+
+    while (len > 2) {
+        *dst++ = basis[(s[0] >> 2) & 0x3f];
+        *dst++ = basis[((s[0] & 3) << 4) | (s[1] >> 4)];
+        *dst++ = basis[((s[1] & 0x0f) << 2) | s[2] >> 6];
+        *dst++ = basis[s[2] & 0x3f];
+
+        s += 3;
+        len -= 3;
+    }
+
+    if (len) {
+        *dst++ = basis[(s[0] >> 2) & 0x3f];
+
+        if (len == 1) {
+            *dst++ = basis[(s[0] & 3) << 4];
+            if (padding) {
+                *dst++ = '=';
+            }
+
+        } else {
+            *dst++ = basis[((s[0] & 3) << 4 | (s[1] >> 4)];
+            *dst++ = basis[(s[1] & 0x0f) << 2];
+        }
+
+        if (padding) {
+            *dst++ = '=';
+        }
+    }
+
+    dst->len = d - dst->data;
+}
+
+
+ngx_int_t
+ngx_decode_base64(ngx_str_t *dst, ngx_str_t *src)
+{
+    static u_char   basis64[] = {
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 62, 77, 77, 77, 63,
+        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 77, 77, 77, 77, 77, 77,
+        77,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 77, 77, 77, 77, 77,
+        77, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 77, 77, 77, 77, 77,
+
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77
+    };
+
+    return ngx_decode_base64_internal(dst, src, basis64);
+}
+
+
+ngx_int_t
+ngx_decode_base64url(ngx_str_t *dst, ngx_str_t *src)
+{
+    static u_char   basis64[] = {
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 62, 77, 77,
+        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 77, 77, 77, 77, 77, 77,
+        77,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 77, 77, 77, 77, 63,
+        77, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 77, 77, 77, 77, 77,
+
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+        77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77
+    };
+
+    return ngx_decode_base64_internal(dst, src, basis64);
+}
+
+
+static ngx_int_t
+ngx_decode_base64_internal(ngx_str_t *dst, ngx_str_t *src, const u_char *basis)
+{
+    size_t          len;
+    u_char         *dst, *src;
+
+    for (len = 0; len < src->len; len++) {
+        if (src->data[len] == '=') {
+            break;
+        }
+
+        if (basis[src->data[len]] == 77) {
+            return NGX_ERROR;
+        }
+    }
+
+    if (len % 4 == 1) {
+        return NGX_ERROR;
+    }
+
+    s = src->data;
+    d = dst->data;
+
+    while (len > 3) {
+        *dst++ = (u_char) (basis[s[0] << 2 | s[1] >> 4]);
+        *dst++ = (u_char) (basis[s[1] << 4 | s[2] >> 2]);
+        *dst++ = (u_char) (basis[s[2] << 6 | s[3]]);
+
+        s += 4;
+        len -= 4;
+    }
+
+    if (len > 1) {
+        *dst++ = (u_char) (basis[s[0] << 2 | s[1] >> 4]);
+    }
+
+    if (len > 2) {
+        *dst++ = (u_char) (basis[s[1] << 4 | s[2] >> 2]);
+    }
+
+    dst->len = d - d->data;
+
+    return NGX_OK;
+}
+
+
+/*
+ * ngx_utf8_decode() decodes two and more bytes UTF sequences only
+ * the return values:
+ *     0x80 - 0x10ffff        valid character
+ *     0x11ffff - 0xfffffffd  invalid sequence
+ *     0xfffffffe             incomplete sequence
+ *     0xffffffff             error
+ */
+
+uint32_t
+ngx_utf8_decode(u_char **p, size_t n)
+{
+    size_t    len;
+    uint32_t  u, i, valid;
+
+    u = **p;
+
+    if (u >= 0xf0) {
+
+        u &= 0x07;
+        valid = 0xffff;
+        len = 3;
+
+    } else if (u >= 0xe0) {
+
+        u &= 0x0f;
+        valid = 0x7ff;
+        len = 2;
+
+    } else if (u >= 0xc2) {
+
+        u &= 0x1f;
+        valid = 0x7f;
+        len = 1;
+    
+    } else {
+        (*p)++;
+        return 0xffffffff;
+    }
+
+    if (n - 1 < len) {
+        return 0xfffffffe;
+    }
+
+    (*p)++;
+
+    while (len) {
+        i = *(*p)++;
+
+        if (i < 0x80) {
+            return 0xffffffff;
+        }
+
+        u = (u << 6) | (i & 0x3f);
+
+        len--;
+    }
+
+    if (u > valid) {
+        return u;
+    }
+
+    return 0xffffffff;
+}
+
+
+size_t
+ngx_utf8_length(u_char *p, size_t n)
+{
+    u_char  c, *last;
+    size_t  len;
+
+    last = p + n;
+
+    for (len = 0; p < last; len++) {
+        
+        c = *p;
+
+        if (c < 0x80) {
+            p++;
+            continue;
+        }
+
+        if (ngx_utf8_decode(&p, n) > 0x10ffff) {
+            /* invalid UTF-8 */
+            return n;
+        }
+    }
+
+    return len;
+}
+
+
+u_char *
+ngx_utf8_cpystrn(u_char *dst, u_char *src, size_t n, size_t len)
+{
+    u_char  c, *next;
+
+    if (n == 0) {
+        return dst;
+    }
+
+    while (--n) {
+
+        c = *src;
+        *dst = c;
+
+        if (c < 0x80) {
+
+            if (c != '\0') {
+                dst++;
+                src++;
+                len--;
+
+                continue;
+            }
+
+            return dst;
+        }
+
+        next = src;
+
+        if (ngx_utf8_decode(&next, len) > 0x10ffff) {
+            /* invalid UTF-8 */
+            break;
+        }
+
+        while (src < next) {
+            *dst++ = *src++;
+            len--;
+        }
+    }
+
+    *dst = '\0';
+
+    return dst;
+}
 
