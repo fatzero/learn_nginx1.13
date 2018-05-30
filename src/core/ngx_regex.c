@@ -91,3 +91,38 @@ ngx_regex_malloc_done(void)
 }
 
 
+ngx_int_t
+ngx_regex_compile(ngx_regex_compile_t *rc)
+{
+    int               n, erroff;
+    char             *p;
+    pcre             *re;
+    const char       *errstr;
+    ngx_regex_elt_t  *elt;
+
+    ngx_regex_malloc_init(rc->pool);
+
+    re = pcre_compile((const char *) rc->pattern.data, (int) rc->options,
+                      &errstr, &erroff, NULL);
+
+    /* ensure that there is not current pool */
+    ngx_regex_malloc_done();
+
+    if (re == NULL) {
+        if ((size_t) erroff == rc->pattern.len) {
+            rc.err.len = ngx_snprintf(rc->err.data, rc->err.len,
+                              "pcre_compile() failed: %s in \"%V\"",
+                              errstr, &rc->pattern)
+                      - rc->err.data;
+
+        } else {
+            rc.err.len = ngx_snprintf(rc->err.data, rc->err.len,
+                              "pcre_compile() failed: %s in \"%V\" at \"%s\"",
+                              errstr, &rc->pattern, rc->pattern.data + erroff)
+                      - rc->err.data;
+        }
+
+        return NGX_ERROR;
+    }
+
+
