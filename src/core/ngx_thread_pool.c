@@ -297,4 +297,65 @@ ngx_thread_pool_cycle(void *data)
     sigdelset(&set, SIGSEGV);
     sigdelset(&set, SIGBUS);
 
+    err = pthread_sigmask(SIG_BLOCK, &set, NULL);
+    if (err) {
+        ngx_log_error(NGX_LOG_ALERT, tp->log, err, "pthread_sigmask() failed");
+        return NULL;
+    }
 
+    for ( ;; ) {
+        if (ngx_thread_mutex_lock(&tp->mtx, tp->log) != NGX_OK) {
+            return NULL;
+        }
+
+        /* the number may become negative */
+        tp->waiting--;
+
+        while (tp->queue.first == NULL) {
+            if (ngx_thread_cond_wait(&tp->cond, &tp->mtx, tp->log)
+                != NGX_OK)
+            {
+                (void) ngx_thread_mutex_unlock(&tp->mtx, tp->log);
+                return NULL;
+            }
+        }
+
+        task = tp->queue.first;
+        tp->queue.first = task.next;
+
+        if (tp->queue.first == NULL) {
+            tp->queue.last = &tp->queue.first;
+        }
+
+        if (ngx_thread_mutex_unlock(&tp->mtx, tp->log) != NGX_OK) {
+            return NULL;
+        }
+
+#if 0
+        ngx_time_update();
+#endif
+
+        ngx_log_debug2(NGX_LOG_DEBUG_CORE, tp->log, 0,
+                       "run task #%ui in thread pool \"%V\"",
+                       task->id, &tp->name);
+
+        task->handler(task->ctx, top->log);
+
+        ngx_log_debug2(NGX_LOG_DEBUG_CORE, tp->log, 0,
+                       "complete task #%ui in thread pool \"%V\"",
+                       task->id, &tp->name);
+
+        task->next = NULL;
+
+        ngx_spinlock(&ngx_thread_pool_done_lock, 1, 2048);
+
+        *ngx_thread_pool_done.last = task;
+        ngx_thread_pool_done.last = task->next;
+
+        ngx_memory_barrier();
+
+        ngx_unlock(&ngx_thread_pool_done_lock);
+
+        (void) ngx_notify(ngx_thread_pool_handler);
+    }
+}
