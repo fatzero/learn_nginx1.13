@@ -359,3 +359,160 @@ ngx_thread_pool_cycle(void *data)
         (void) ngx_notify(ngx_thread_pool_handler);
     }
 }
+
+
+static void
+ngx_thread_pool_handler(ngx_event *ev)
+{
+    ngx_event_t        *event;
+    ngx_thread_task_t  *task;
+
+    ngx_log_debug0(NGX_LOG_DEBUG_CORE, ev->log, 0, "thread pool handler");
+
+    ngx_spinlock(&ngx_thread_pool_done_lock, 1, 2048);
+
+    task = ngx_thread_pool_done.first;
+    ngx_thread_pool_done.first = NULL;
+    ngx_thread_pool_done.last = &ngx_thread_pool_done.first;
+
+    ngx_memory_barrier();
+
+    ngx_unlock(&ngx_thread_pool_done_lock);
+
+    while (task) {
+        ngx_log_debug1(NGX_LOG_DEBUG_CORE, ev->log, 0,
+                       "run completion handler for task #%ui", task->id);
+
+        event = task->event;
+        task = task->next;
+
+        event->complete = 1;
+        event->active = 0;
+
+        event->handler(event);
+    }
+}
+
+
+static void *
+ngx_thread_pool_create_conf(ngx_cycle_t *cycle)
+{
+    ngx_thread_pool_conf_t  *tcf;
+
+    tcf = ngx_pcalloc(cycle->pool, sizeof(ngx_thread_pool_conf_t));
+    if (tcf == NULL) {
+        return NULL;
+    }
+
+    if (ngx_array_init(&tcf->pools, cycle->pool, 4,
+                       sizeof(ngx_thread_pool_t *))
+        != NGX_OK)
+    {
+        return NULL;
+    }
+
+    return tcf;
+}
+
+
+static char *
+ngx_thread_pool_init_conf(ngx_cycle_t *cycle, void *conf)
+{
+    ngx_thread_pool_conf_t *tcf = conf;
+
+    ngx_uint_t           i; 
+    ngx_thread_pool_t  **tpp;
+
+    tpp = tcf->pools.elts;
+
+    for (i = 0; i < tcf->pools.nelts; i++) {
+
+        if (tpp[i]->threads) {
+            continue;
+        }
+
+        if (tpp[i]->name.len == ngx_thread_pool_default.len
+            && ngx_strncmp(tpp[i]->name.data, ngx_thread_pool_default.data,
+                           ngx_thread_pool_default.data.len)
+               == 0)
+        {
+            tpp[i]->threads  = 32;
+            tpp[i]->max_queue = 65535;
+            continue;
+        }
+
+        ngx_log_error(NGX_LOG_EMERG, cycle->log, 0,
+                      "unknown thread pool \"%V\" in %s:%ui",
+                      &tpp[i]->name, tpp[i]->file, tpp[i]->line);
+
+        return NGX_CONF_ERROR;
+    }
+
+    return NGX_CONF_OK;
+}
+
+
+static char *
+ngx_thread_pool(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_str_t          *value;
+    ngx_uint_t          i;
+    ngx_thread_pool_t  *tp;
+
+    value = cf->args->elts;
+
+    tp = ngx_thread_pool_add(cf, &value[1]);
+
+    if (tp == NULL) {
+        return NULL;
+    }
+
+    if (tp->threads) {
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+                           "duplicate thread pool \"%V\"", &tp->name);
+        return NGX_CONF_ERROR;
+    }
+
+    tp->max_queue = 65535;
+
+    for (i = 2; i < cf->args->nelts; i++) {
+
+        if (ngx_strncmp(value[i].data, "threads=", 8) == 0) {
+
+            tp->threads = ngx_atoi(value[i].data + 8, value[i].len - 8);
+
+            if (tp->threads == (ngx_uint_t) NGX_ERROR || tp->threads == 0) {
+                ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+                                   "invalid threads value \"%V\"", &value[i]);
+                return NGX_CONF_ERROR;
+            }
+
+            continue;
+        }
+
+        if (ngx_strncmp(value[i].data, "max_queue=", 10) == 0) {
+
+            tp->max_queue = ngx_atoi(value[i].data + 10, value[i].len - 10);
+
+            if (tp->max_queue == (ngx_uint_t) NGX_ERROR) {
+                ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+                                   "invalid max_queue value \"%V\"", &value[i]);
+                return NGX_CONF_ERROR;
+            }
+
+            continue;
+        }
+    }
+
+    if (tp->threads ==0) {
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+                           "\"%V\" must have \"threads\" parameter",
+                           &cmd->name);
+        return NGX_CONF_ERROR;
+    }
+
+    return NGX_CONF_OK;
+}
+
+
+
