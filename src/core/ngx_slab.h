@@ -35,7 +35,7 @@ typedef struct {
     ngx_shmtx_sh_t    lock;
 
     size_t            min_size;
-    size_t            max_shift;
+    size_t            min_shift;
 
     ngx_slab_page_t  *pages;
     ngx_slab_page_t  *last;
@@ -46,7 +46,7 @@ typedef struct {
 
     u_char           *start;
     u_char           *end;
-    
+
     ngx_shmtx_t       mutex;
 
     u_char           *log_ctx;
@@ -59,6 +59,13 @@ typedef struct {
 } ngx_slab_pool_t;
 
 
-void ngx_slab_init(ngx_slab_pool_t 
+void ngx_slab_init(ngx_slab_pool_t *pool);
+void *ngx_slab_alloc(ngx_slab_pool_t *pool, size_t size);
+void *ngx_slab_alloc_locked(ngx_slab_pool_t *pool, size_t size);
+void *ngx_slab_calloc(ngx_slab_pool_t *pool, size_t size);
+void *ngx_slab_calloc_locked(ngx_slab_pool_t *pool, size_t size);
+void ngx_slab_free(ngx_slab_pool_t *pool, void *p);
+void ngx_slab_free_locked(ngx_slab_pool_t *pool, void *p);
+
 
 #endif /* _NGX_SLAB_H_INCLUDED_ */
