@@ -161,3 +161,109 @@ ngx_slab_init(ngx_slab_pool_t *pool)
     pool->zero = '\0';
 }
 
+
+void *
+ngx_slab_alloc(ngx_slab_pool_t *pool, size_t size)
+{
+    void  *p;
+    
+    ngx_shmtx_lock(&pool->mutex);
+    
+    p = ngx_slab_alloc_locked(pool, size);
+    
+    ngx_shmtx_unlock(&pool->mutex);
+    
+    return p;
+}
+
+
+void *
+ngx_slab_alloc_locked(ngx_slab_pool_t *pool, size_t size)
+{
+    size_t             s;
+    uint_ptr_t         p;
+    ngx_uint_t         i, slot, shift, map;
+    ngx_slab_page_t   *page;
+
+    if (size > ngx_slab_max_size) {
+
+        ngx_log_debug(NGX_LOG_DEBUG_ALLOC, ngx_cycle->log, 0,
+                      "slab alloc: %uz", size);
+
+        page = ngx_slab_alloc_pages(pool, (size >> ngx_pagesize_shift)
+                                          +  ((size % ngx_pagesize) ? 1 : 0));
+        if (page) {
+            p = ngx_slab_page_addr(pool, page);
+
+        } else {
+            p = 0;
+        }
+
+        goto done;
+    }
+
+    if (size > pool->min_size) {
+        shift = 1;
+        for (s = size - 1; s >>= 1; shift++) { /* void */ }
+        slot = shift - pool->min_shift;
+
+    } else {
+        shift = pool->min_shift;
+        slot = 0;
+    }
+
+    pool->stats[slot]->reqs++;
+
+    ngx_log_debug2(NGX_LOG_DEBUG_ALLOC, ngx_cycle->log, 0,
+                   "slab alloc: %uz slot: %ui", size, slot);
+
+    slot = ngx_slab_slots(pool);
+    page = slots[slot].next;
+
+    if (page->next != page) {
+
+        if (shift < ngx_slab_exact_shift) {
+
+            bitmap = (uintptr_t *) ngx_slab_page_addr(pool, page);
+
+            map = (ngx_pageisze >> shift) / (sizeof(uintptr_t) * 8);
+
+            for (n = p; n < map; n++) {
+
+                if (bitmap[n] != NGX_SLAB_BUSY) {
+
+                    for (m = 1, i = 0; m; m <<= 1; i++) {
+                        if (bitmap[n] & m) {
+                            continue;
+                        }
+
+                        bitmap[n] |= m;
+
+                        i = (n * sizeof(uintptr_t) * 8 + i) << shift;
+
+                        p = (uintptr_t) bitmap + i;
+
+                        pool->stats[slots].used++;
+
+                        if (bitmap[n] == NGX_SLAB_BUSY) {
+                            for (n = n + 1; n < map; n++) {
+                                if (bitmap[n] != NGX_SLAB_BUSY) {
+                                    goto done;
+                                }
+                            }
+
+                            prev = ngx_slab_page_prev(page);
+                            prev->next = page->next;
+                            page->next->prev = page->prev;
+
+                            page->next = NULL;
+                            page->prev = NGX_SLAB_SMALL;
+                        }
+
+                        goto done;
+                    }
+                }
+            }
+
+        } else if (shift == ngx_slab_exact_shift) {
+
