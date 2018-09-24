@@ -267,3 +267,185 @@ ngx_slab_alloc_locked(ngx_slab_pool_t *pool, size_t size)
 
         } else if (shift == ngx_slab_exact_shift) {
 
+            for (m = 1, i = 0; m; m <<= 1, i++) {
+                if (page->slab & m) {
+                    continue;
+                }
+
+                page->slab |= m;
+
+                if (page->slab == NGX_SLAB_BUSY) {
+                    prev = ngx_slab_page_prev(page);
+                    prev->next = page->next;
+                    page->next->prev = page->prev;
+                    
+                    page->next = NULL;
+                    page->prev = NGX_SLAB_EXACGT;
+                }
+
+                p = ngx_slab_page_addr(pool, page) + (i << shift);
+
+                pool->stats[slot].used++;
+
+                goto done;
+            }
+
+        } else { /* shift > ngx_slab_exact_shift */
+
+           mask = ((uintptr_t) 1 << (ngx_pagesize >> shift)) - 1; 
+           mask <<= NGX_SLAB_MAP_SHIFT;
+
+           for (m = (uintptr_t) 1 << NGX_SLAB_MAP_SHIFT, i = 0;
+                m & mask;
+                m << 1, i++)
+           {
+               if (page->slab & m) {
+                   continue;
+               }
+
+               page->slab |= m;
+
+               if ((page->slab & NGX_SLAB_MAP_MASK) == mask) {
+                   prev = ngx_slab_page_prev(page);
+                   prev->next = page->next;
+                   page->next->prev = page->prev;
+
+                   page->next = NULL;
+                   page->prev = NGX_SLAB_BIG;
+               }
+
+               p = ngx_slab_page_addr(pool, page) + (i << shift);
+
+               pool->stats[slot].used++;
+
+               goto done;
+           }
+        }
+
+        ngx_slab_error(pool, NGX_LOG_ALERT, "ngx_slab_alloc(): page is busy");
+        ngx_debug_point();
+    }
+
+    page = ngx_slab_alloc_pages(pool, 1);
+
+    if (page) {
+        if (shift < ngx_slab_exact_shift) {
+            bitmap = (uintptr_t *) ngx_slab_page_addr(pool, page);
+
+            n = (ngx_pagesize >> shift) / ((1 << shift) * 8);
+
+            if (n == 0) {
+                n = 1;
+            }
+
+            /* "n" elements for bitmap, plus one requested */
+            bitmap[0] = ((uintptr_t) 2 << n) - 1;
+
+            map = (ngx_pagesize >> shift) / (sizeof(uintptr_t) * 8);
+
+            for (i = 1; i < map; i++) {
+                bitmap[i] = 0;
+            }
+
+            page->slab = shift;
+            page->next = &slots[slot];
+            page->prev = (uintptr_t) &slots[slot] | NGX_SLAB_SMALL;
+
+            slots[slot].next = page;
+
+            pool->stats[slot].total += (ngx_pagesize >> shift) - n;
+
+            p = ngx_slab_page_addr(pool, page) + (n << shift);
+
+            pool->stats[slot].used++;
+
+            goto done;
+
+        } else if (shift == ngx_slab_exact_shift) {
+
+            page->slab = 1;
+            page->next = &slots[slot];
+            page->prev = (uintptr_t) &slots[slot] | NGX_SLAB_EXACT_SIZE;
+
+            slots[slot].next = page;
+
+            pool->stats[slot].total += sizeof(uintptr_t) * 8;
+
+            p = ngx_slab_page_addr(pool, page);
+
+            pool->stats[slot].used++;
+
+            goto done;
+
+        } else { /* shift > ngx_slab_exact_shift */
+
+            page->slab = ((uintptr_t) 1 << NGX_SLAB_MAP_SHIFT) | shift;
+            page->next = &slots[slot];
+            page->prev = (uintptr_t) &slots[slot] | NGX_SLAB_BIG;
+
+            slots[slot].next = page;
+
+            pool->stats[slot].total += ngx_pagesize >> shift;
+
+            p = ngx_slab_page_addr(pool, page);
+
+            pool->stats[slot].used++;
+
+            goto done;
+        }
+    }
+
+    p = 0;
+
+    pool->stats[slot].fails++;
+
+done:
+
+    ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0,
+                   "slab alloc: %p", (void *) p);
+
+    return (void *) p;
+}
+
+
+void *
+ngx_slab_calloc(ngx_slab_pool_t *pool, size_t size)
+{
+    void  *p;
+
+    ngx_shmtx_lock(&pool->mutex);
+
+    p = ngx_slab_calloc_locked(pool, size);
+
+    ngx-shmtx_unlock(&pool->mutex);
+
+    return p;
+}
+
+
+void *
+ngx_slab_calloc_locked(ngx_slab_pool_t *pool, size_t size)
+{
+    void  *p;
+
+    p = ngx_slab_alloc_locked(pool, size);
+    if (p) {
+        ngx_memzero(p, size);
+    }
+
+    return p;
+}
+
+
+void
+ngx_slab_free(ngx_slab_pool_t *pool, void *p)
+{
+    ngx_shmtx_lock(&pool->mutex);
+
+    ngx_slab_free_locked(pool, p);
+
+    ngx_shmtx_unlock(&pool->mutex);
+}
+
+
+
